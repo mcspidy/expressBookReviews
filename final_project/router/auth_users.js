@@ -9,18 +9,21 @@ let users = [
 
 const isValid = (username)=>{ //returns boolean
     //write code to check is the username is valid
-    return users.some(user => user.username === username)
+    const userMatches = users.filter((user) => user.username === username);
+    return userMatches.length > 0;
 }
 
 const authenticatedUser = (username,password)=>{ //returns boolean
-//write code to check if username and password match the one we have in records.
+    //write code to check if username and password match the one we have in records.
+    const matchingUsers = users.filter((user) => user.username === username && user.password === password);
+    return matchingUsers.length > 0;
 }
 
 //only registered users can login
 regd_users.post("/login", (req,res) => {
     //Write your code here
     //return res.status(300).json({message: "Yet to be implemented"});
-    const username = req.body.username;
+    const username = req.body.username; //Task 7
     const password = req.body.password;
 
     if (authenticatedUser(username, password)) {

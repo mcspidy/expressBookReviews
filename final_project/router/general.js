@@ -26,6 +26,7 @@ public_users.post("/register", (req,res) => {
     //Write your code here
     //return res.status(300).json({message: "Yet to be implemented"});
     const {username, password} = req.body;  //Task 6
+    
 
     if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required"});
