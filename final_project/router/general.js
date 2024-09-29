@@ -17,10 +17,26 @@ public_users.get('/',function (req, res) {
   //return res.status(300).json({message: "Get Books yet to be implemented"});
 });
 
+const getISBN = (isbn) => {
+  return new Promise((resolve, reject) => {
+    let isbnNo = parseInt(isbn);
+    if (books[isbnNo]) {
+      resolve(books[isbnNo]);
+    } else {
+      reject({ status: 404, message: 'ISBN ${isbn} not found!' })
+    }
+  });
+};
+
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    //Write your code here
+    //return res.status(300).json({message: "Yet to be implemented"});
+    getISBN(req.params.isbn)    //Task 2
+    .then(
+        result => res.send(result),
+        error => res.status(error.status).json({message: error.message})
+  );
  });
   
 // Get book details based on author
