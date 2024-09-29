@@ -23,15 +23,28 @@ const getISBN = (isbn) => {
 };
 
 public_users.post("/register", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    //Write your code here
+    //return res.status(300).json({message: "Yet to be implemented"});
+    const {username, password} = req.body;  //Task 6
+
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required"});
+    }
+  
+    // if (!doesExist(user.username)) {
+    if (isValid(username)) {
+        return res.status(409).json({ message: "Username already exists" });
+    }
+
+    users.push({ username, password });
+    return res.status(201).json({ message: "User registered successfully" });
 });
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-  //Write your code here
-  res.send(JSON.stringify(books,null,4))    //Task 1
-  //return res.status(300).json({message: "Get Books yet to be implemented"});
+    //Write your code here
+    res.send(JSON.stringify(books,null,4))    //Task 1
+    //return res.status(300).json({message: "Get Books yet to be implemented"});
 });
 
 // Get book details based on ISBN
