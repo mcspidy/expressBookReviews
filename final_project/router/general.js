@@ -4,6 +4,8 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
+//const axios = require("axios");
+
 const getBooks = () => {
   // book list
   return new Promise((resolve, reject) => {
@@ -25,20 +27,21 @@ const getISBN = (isbn) => {
 public_users.post("/register", (req,res) => {
     //Write your code here
     //return res.status(300).json({message: "Yet to be implemented"});
-    const {username, password} = req.body;  //Task 6
+    const username = req.body.username;
+    const password = req.body.password;
     
-
-    if (!username || !password) {
-        return res.status(400).json({ message: "Username and password are required"});
+    if (password && username) {
+      // Check if the user does not already exist
+      if (isValid(username)) {
+        // Add the new user to the users array
+        users.push({ username: username, password: password });
+        res.status(200).json("Registration complete!Now you can login");
+      } else {
+        res.status(404).json({ message: "Unable to register user" });
+      }
+    } else {
+      res.status(400).json({ message: "Username and password are required"});
     }
-  
-    // if (!doesExist(user.username)) {
-    if (isValid(username)) {
-        return res.status(409).json({ message: "Username already exists" });
-    }
-
-    users.push({ username, password });
-    return res.status(201).json({ message: "User registered successfully" });
 });
 
 // Get the book list available in the shop

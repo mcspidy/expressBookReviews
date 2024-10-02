@@ -3,21 +3,36 @@ const jwt = require('jsonwebtoken');
 let books = require("./booksdb.js");
 const regd_users = express.Router();
 
-let users = [
-    { username: 'mcspidy', password: 'ball00n'}
-];
+let users = [{ username: 'mcspidy', password: 'B@ll00n'}];
 
 const isValid = (username)=>{ //returns boolean
     //write code to check is the username is valid
-    const userMatches = users.filter((user) => user.username === username);
-    return userMatches.length > 0;
-}
+    let userMatches = users.filter((user) => {
+        return user.username === username;
+    });
+    
+    if (userMatches.length > 0) {
+        return false;
+    } else {
+        return true;
+    }
+    
+    //return userMatches.length > 0;
+};
 
 const authenticatedUser = (username,password)=>{ //returns boolean
     //write code to check if username and password match the one we have in records.
-    const matchingUsers = users.filter((user) => user.username === username && user.password === password);
-    return matchingUsers.length > 0;
-}
+    let validUsers = users.filter((user) => {
+        return user.username === username && user.password === password;
+      });
+      if (validUsers.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+      //returns boolean
+      //check if username and password match the one we have in records.
+    };
 
 //only registered users can login
 regd_users.post("/login", (req,res) => {
@@ -37,8 +52,39 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    //Write your code here
+    //return res.status(300).json({message: "Yet to be implemented"});
+    const isbn = req.params.isbn;
+    const { review } = req.body;
+    let token = req.session.authorization.accessToken;
+    
+    let dcdr = jwt.verify(token, 'access');
+    const username = dcdr.username;
+
+    if (books[isbn]) {
+        books[isbn].reviews[username] = review;
+        return res.status(200).send("Review posted");
+    } else {
+        return res.status(404).send("IBSN ${isbn} not found");
+    }
+});
+
+//Delete  a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    //Write your code here
+    //return res.status(300).json({message: "Yet to be implemented"});
+    const isbn = req.params.isbn;
+    let token = req.session.authorization.accessToken;
+
+    let dcdr = jwt.verify(token, 'access');
+    const username = dcdr.username;
+
+    if (books[isbn].reviews[username]) {
+        delete books[isbn].reviews[username];
+        return res.send("Review deleted");
+    } else {
+        return res.send("Review not found");
+    }
 });
 
 module.exports.authenticated = regd_users;
