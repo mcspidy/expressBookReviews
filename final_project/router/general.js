@@ -4,23 +4,12 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
-//const axios = require("axios");
+const axios = require("axios");
 
 const getBooks = () => {
   // book list
   return new Promise((resolve, reject) => {
     resolve(books);
-  });
-};
-
-const getISBN = (isbn) => {
-  return new Promise((resolve, reject) => {
-    let isbnNo = parseInt(isbn);
-    if (books[isbnNo]) {
-      resolve(books[isbnNo]);
-    } else {
-      reject({ status: 404, message: 'ISBN ${isbn} not found!' })
-    }
   });
 };
 
@@ -45,43 +34,56 @@ public_users.post("/register", (req,res) => {
 });
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
+public_users.get('/',async function (req, res) {
     //Write your code here
+    const books = await getBooks();
     res.send(JSON.stringify(books,null,4))    //Task 1
     //return res.status(300).json({message: "Get Books yet to be implemented"});
 });
 
+const getISBN = (isbn) => 
+  Promise.resolve(books[isbn]);
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+public_users.get('/isbn/:isbn',async function (req, res) {
     //Write your code here
     //return res.status(300).json({message: "Yet to be implemented"});
-    getISBN(req.params.isbn)    //Task 2
-    .then(
-        result => res.send(result),
-        error => res.status(error.status).json({message: error.message})
-  );
+    const isbn = req.params.isbn;
+    const book = await getISBN(isbn);
+    if (book) {
+      res.status(200).send(book);
+    } else {
+      res.status(404).send("No books found by ISNB ${isbn}!")
+    }
  });
-  
+
+ const getBookAuthor = (author) =>
+  Promise.resolve(Object.values(books).filter(book => book.author === author));
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author',async function (req, res) {
     //Write your code here
     //return res.status(300).json({message: "Yet to be implemented"});
     const author = req.params.author;   //Task 3
-    getBooks()
-    .then((bookEntries) => Object.values(bookEntries))
-    .then((books) => books.filter((book) => book.author === author))
-    .then((filteredBooks) => res.send(filteredBooks));
+    const bookAuthor = await getBookAuthor(author);
+    if (bookAuthor.length > 0) {
+      res.status(200).send(bookAuthor)
+    } else {
+      res.status(404).semd("Book author not found.")
+    }
 });
 
+const getBookTitle = (title) =>
+  Promise.resolve(Object.values(books).filter(book => book.title === title));
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+public_users.get('/title/:title',async function (req, res) {
     //Write your code here
     //return res.status(300).json({message: "Yet to be implemented"});
     const title = req.params.title; //Task 4
-    getBooks()
-    .then((bookEntries) => Object.values(bookEntries))
-    .then((books) => books.filter((book) => book.title === title))
-    .then((filteredBooks) => res.send(filteredBooks));
+    const bookTitle = await getBookTitle(title);
+    if (bookTitle.length > 0) {
+      res.status(200).send(bookTitle)
+    } else {
+      res.status(404).semd("Book Title not found.")
+    }
 });
 
 //  Get book review
