@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 let books = require("./booksdb.js");
 const regd_users = express.Router();
 
-let users = [{ username: 'mcspidy', password: 'B@ll00n'}];
+let users = [] ;
 
 const isValid = (username)=>{ //returns boolean
     //write code to check is the username is valid
@@ -44,7 +44,7 @@ regd_users.post("/login", (req,res) => {
     if (authenticatedUser(username, password)) {
         let accessToken = jwt.sign({data:password}, "access", {expiresIn: 60 * 60});
         req.session.authorization = {accessToken,username};
-        return res.status(200).send("User successfully logged in");
+        return res.status(200).send("Customer successfully logged in");
     } else {
         return res.status(208).json({message: "Invalid username or password"});
     }

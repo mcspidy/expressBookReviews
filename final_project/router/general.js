@@ -24,7 +24,7 @@ public_users.post("/register", (req,res) => {
       if (isValid(username)) {
         // Add the new user to the users array
         users.push({ username: username, password: password });
-        res.status(200).json("Registration complete!Now you can login");
+        res.status(200).json({message: "Customer successfully registred. Now you can login"});
       } else {
         res.status(404).json({ message: "Unable to register user" });
       }
@@ -37,7 +37,8 @@ public_users.post("/register", (req,res) => {
 public_users.get('/',async function (req, res) {
     //Write your code here
     const books = await getBooks();
-    res.send(JSON.stringify(books,null,4))    //Task 1
+    //res.send(JSON.stringify(books,null,4))    //Task 1
+    res.send({"Books": books})
     //return res.status(300).json({message: "Get Books yet to be implemented"});
 });
 
@@ -50,7 +51,7 @@ public_users.get('/isbn/:isbn',async function (req, res) {
     const isbn = req.params.isbn;
     const book = await getISBN(isbn);
     if (book) {
-      res.status(200).send(book);
+      res.status(200).send({"BookByISBN": book});
     } else {
       res.status(404).send("No books found by ISNB ${isbn}!")
     }
@@ -65,9 +66,9 @@ public_users.get('/author/:author',async function (req, res) {
     const author = req.params.author;   //Task 3
     const bookAuthor = await getBookAuthor(author);
     if (bookAuthor.length > 0) {
-      res.status(200).send(bookAuthor)
+      res.status(200).send({"BookByAuthor": bookAuthor})
     } else {
-      res.status(404).semd("Book author not found.")
+      res.status(404).send("Book author not found.")
     }
 });
 
@@ -80,9 +81,9 @@ public_users.get('/title/:title',async function (req, res) {
     const title = req.params.title; //Task 4
     const bookTitle = await getBookTitle(title);
     if (bookTitle.length > 0) {
-      res.status(200).send(bookTitle)
+      res.status(200).send({"BookByTitle": bookTitle})
     } else {
-      res.status(404).semd("Book Title not found.")
+      res.status(404).send("Book Title not found.")
     }
 });
 
@@ -91,8 +92,8 @@ public_users.get('/review/:isbn',function (req, res) {
     //Write your code here
     //return res.status(300).json({message: "Yet to be implemented"});
     const isbn = req.params.isbn;   //Task 5
-    getISBN(req.params.isbn)
-    .then(
+    getISBN(isbn)
+    .then(        
         result => res.send(result.reviews),
         error => res.status(error.status).json({message: error.message})
   );
