@@ -60,7 +60,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     const book = books[isbn];
 
     if(!username){
-        return res.status(401).send("Unauthorized");
+        return res.status(401).send("Unauthorized user");
     }
 
     if (book) {
@@ -80,7 +80,7 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
     const book = books[isbn];
 
     if(!username){
-        return res.status(401).send("Unauthorized");
+        return res.status(401).send("Unauthorized user");
     }
 
     if (book) {
