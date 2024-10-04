@@ -55,17 +55,19 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     //Write your code here
     //return res.status(300).json({message: "Yet to be implemented"});
     const isbn = req.params.isbn;
-    const { review } = req.body;
-    let token = req.session.authorization.accessToken;
-    
-    let dcdr = jwt.verify(token, 'access');
-    const username = dcdr.username;
+    const review = req.query.review;
+    const username = req.session.authorization.username;
+    const book = books[isbn];
 
-    if (books[isbn]) {
-        books[isbn].reviews[username] = review;
-        return res.status(200).send("Review posted");
-    } else {
-        return res.status(404).send("IBSN ${isbn} not found");
+    if(!username){
+        return res.status(401).send("Unauthorized");
+    }
+
+    if (book) {
+        book.reviews[username] = review;
+        res.send(`The review for the book with ISBN ${isbn} has been added/updated.`);
+     } else {
+         return res.status(404).send(`IBSN ${isbn} not found`);
     }
 });
 
@@ -74,16 +76,22 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
     //Write your code here
     //return res.status(300).json({message: "Yet to be implemented"});
     const isbn = req.params.isbn;
-    let token = req.session.authorization.accessToken;
+    const username = req.session.authorization.username;
+    const book = books[isbn];
 
-    let dcdr = jwt.verify(token, 'access');
-    const username = dcdr.username;
+    if(!username){
+        return res.status(401).send("Unauthorized");
+    }
 
-    if (books[isbn].reviews[username]) {
-        delete books[isbn].reviews[username];
-        return res.send("Review deleted");
+    if (book) {
+        if (book.reviews[username]) {
+            delete book.reviews[username];
+            return res.send(`Reviews for the ISBN ${isbn} posted by the user ${username} deleted`);
+        } else {
+            return res.send(`Customer ${username} for IBSN ${isbn} review not found`);
+        }            
     } else {
-        return res.send("Review not found");
+        return res.send(`IBSN ${isbn} book not found`);
     }
 });
 
